@@ -12,7 +12,6 @@ package main
 // Kept in a dedicated file to minimise rebase conflicts against upstream.
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
