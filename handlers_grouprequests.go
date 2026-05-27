@@ -191,7 +191,7 @@ func (s *server) SetGroupJoinApprovalMode() http.HandlerFunc {
 			return
 		}
 
-		err = clientManager.GetWhatsmeowClient(txtid).SetGroupJoinApprovalMode(context.Background(), group, t.Mode)
+		err = client.SetGroupJoinApprovalMode(r.Context(), group, t.Mode)
 
 		if err != nil {
 			log.Error().Str("error", fmt.Sprintf("%v", err)).Msg("failed to set group join approval mode")
