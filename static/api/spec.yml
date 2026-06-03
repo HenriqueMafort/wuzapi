@@ -883,6 +883,21 @@ paths:
             application/json:
               schema:
                 example: { "code": 200, "data": { "Details": "User unblocked", "JID": "5491155553935@s.whatsapp.net", "Blocklist": [], "DHash": "1234567891" }, "success": true }
+  /user/blocklist:
+    get:
+      tags:
+        - User
+      summary: Get the current blocklist
+      description: Returns the list of WhatsApp users currently blocked by the session.
+      security:
+        - ApiKeyAuth: []
+      responses:
+        200:
+          description: Current blocklist
+          content:
+            application/json:
+              schema:
+                example: { "code": 200, "data": { "Blocklist": [ "5491155553935@s.whatsapp.net" ], "DHash": "1234567890" }, "success": true }
   /user/lid/{phone}:
     get:
       tags:

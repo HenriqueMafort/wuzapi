@@ -697,6 +697,35 @@ Response:
 
 ---
 
+## Get Blocklist
+
+Returns the list of WhatsApp users currently blocked by the session.
+
+Endpoint: _/user/blocklist_
+
+Method: **GET**
+
+```
+curl -s -X GET -H 'Token: 1234ABCD' http://localhost:8080/user/blocklist
+```
+
+Response:
+
+```json
+{
+  "code": 200,
+  "data": {
+    "Blocklist": [
+      "5491155554445@s.whatsapp.net"
+    ],
+    "DHash": "1234567890"
+  },
+  "success": true
+}
+```
+
+---
+
 
 # Chat
 

@@ -3637,6 +3637,53 @@ func (s *server) UnblockUser() http.HandlerFunc {
 	return s.updateUserBlocklist(events.BlocklistChangeActionUnblock)
 }
 
+// formatBlocklist converts a whatsmeow blocklist into the JSON-friendly shape
+// returned by the blocklist endpoints: the blocked JIDs as strings plus the
+// dhash. A nil blocklist yields an empty list (never null) and an empty dhash.
+func formatBlocklist(blocklist *types.Blocklist) map[string]interface{} {
+	jids := make([]string, 0)
+	dhash := ""
+	if blocklist != nil {
+		jids = make([]string, 0, len(blocklist.JIDs))
+		for _, blockedJID := range blocklist.JIDs {
+			jids = append(jids, blockedJID.String())
+		}
+		dhash = blocklist.DHash
+	}
+	return map[string]interface{}{
+		"Blocklist": jids,
+		"DHash":     dhash,
+	}
+}
+
+// GetBlocklist returns the current list of blocked users.
+func (s *server) GetBlocklist() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		txtid := r.Context().Value("userinfo").(Values).Get("Id")
+		client := clientManager.GetWhatsmeowClient(txtid)
+		if client == nil {
+			s.Respond(w, r, http.StatusInternalServerError, errors.New("no session"))
+			return
+		}
+
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		blocklist, err := client.GetBlocklist(ctx)
+		if err != nil {
+			s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("failed to get blocklist: %s", err)))
+			return
+		}
+
+		responseJson, err := json.Marshal(formatBlocklist(blocklist))
+		if err != nil {
+			s.Respond(w, r, http.StatusInternalServerError, err)
+		} else {
+			s.Respond(w, r, http.StatusOK, string(responseJson))
+		}
+	}
+}
+
 // Sets Chat Presence (typing/paused/recording audio)
 func (s *server) ChatPresence() http.HandlerFunc {
 
